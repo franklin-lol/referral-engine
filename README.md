@@ -3,6 +3,11 @@
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#running-tests)
+[![CI](https://github.com/franklin-lol/referral-engine/actions/workflows/tests.yml/badge.svg)](https://github.com/franklin-lol/referral-engine/actions/workflows/tests.yml)
+
+**Language / Язык:** [English](#) · [Русский](README.ru.md)
+
+---
 
 Pluggable, async-native multi-level referral distribution engine for Python services.
 
@@ -462,16 +467,31 @@ referral-engine/
 ├── examples/
 │   └── quickstart.py              # runnable demo, MemoryAdapter, no DB or Docker needed
 │
+├── .github/
+│   └── workflows/
+│       └── tests.yml              # CI — runs all tests on push/PR
+│
 ├── .gitignore
+├── CHANGELOG.md                   # version history
+├── CONTRIBUTING.md                # contribution guide
+├── LICENSE                        # MIT
+├── SECURITY.md                    # vulnerability reporting
 ├── config.example.yaml            # fully documented configuration template
 ├── docker-compose.yml             # postgres (schema auto-applied) + api on :8000
 ├── Dockerfile
 ├── pyproject.toml                 # deps, optional groups: [api] [test] [dev], pytest config
-└── README.md
+├── README.md                      # English documentation
+└── README.ru.md                   # Русская документация
 ```
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
