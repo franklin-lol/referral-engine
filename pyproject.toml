@@ -8,16 +8,19 @@ version = "0.1.0"
 description = "Pluggable, async-native multi-level referral distribution engine"
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Your Name", email = "your.email@example.com"}
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = [
+
+[tool.setuptools]
+packages = ["referral_engine"]
+
+[project.optional-dependencies]
     "asyncpg>=0.29.0",
     "pyyaml>=6.0.1",
 ]
