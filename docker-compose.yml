@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       referral_engine
+      POSTGRES_USER:     re_user
+      POSTGRES_PASSWORD: re_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U re_user -d referral_engine"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── API ──────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL:    postgresql://re_user:re_pass@postgres:5432/referral_engine
+      ENGINE_CONFIG:   /app/config.example.yaml
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config.example.yaml:/app/config.example.yaml:ro
+
+volumes:
+  pgdata:
