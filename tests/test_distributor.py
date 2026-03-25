@@ -40,7 +40,11 @@ def config_no_deposit_check() -> EngineConfig:
 def config_capped() -> EngineConfig:
     """All levels 10%, single-event income cap of 5.0."""
     levels = [LevelConfig(level=i, rate=10.0) for i in range(1, 6)]
-    return EngineConfig(levels=levels, income_cap_per_event=5.0)
+    return EngineConfig(
+        levels=levels,
+        income_cap_per_event=5.0,
+        require_active_deposit=False,
+    )
 
 
 @pytest.fixture
