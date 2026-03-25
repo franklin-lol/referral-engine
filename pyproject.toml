@@ -18,7 +18,7 @@ classifiers = [
 ]
 
 [tool.setuptools]
-packages = ["referral_engine"]
+packages = ["referral_engine", "referral_engine.adapters"]
 
 [project.optional-dependencies]
 db = [
