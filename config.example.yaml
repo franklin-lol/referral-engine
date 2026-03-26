@@ -1,0 +1,56 @@
+# referral-engine configuration
+# ================================
+# Copy to config.yaml and adjust to your product.
+# This file is loaded at startup — no redeployment needed for rate changes.
+
+# Per-level accrual rates (percentages of the base profit event).
+# List length = number of active levels.
+# Set a rate to 0.0 to skip a level entirely (walk still continues upward).
+rates:
+  - 12.0   # Level  1 – direct referrer
+  - 10.0   # Level  2
+  -  8.0   # Level  3
+  -  6.0   # Level  4
+  -  5.0   # Level  5
+  -  4.0   # Level  6
+  -  3.0   # Level  7
+  -  3.0   # Level  8
+  -  2.0   # Level  9
+  -  2.0   # Level 10
+  -  1.0   # Level 11
+  -  1.0   # Level 12
+  -  1.0   # Level 13
+  -  1.0   # Level 14
+  -  1.0   # Level 15
+
+# Hard cap for tree traversal (prevents runaway BFS on huge trees).
+max_depth: 50
+
+# When true, a referrer is skipped (walk continues upward) if they
+# have no active deposit.  Set to false to pay everyone regardless.
+require_active_deposit: true
+
+# Maximum bonus any single user can receive per distribution event.
+# Uncomment and set a value to enable.
+# income_cap_per_event: 500.0
+
+# Amounts below this threshold are silently dropped (floating-point noise).
+min_accrual_amount: 0.000001
+
+# Idempotency window in seconds.  Two distribute() calls with the same
+# source_tag within this window are treated as duplicates.
+# Default: 86400 (one calendar day).
+idempotency_window_seconds: 86400
+
+# Leader bonus thresholds — one-time awards when structure volume crosses
+# a threshold.  Comment out the whole section to disable.
+leader_thresholds:
+  - { level: 1, volume:    10000, bonus:    100 }
+  - { level: 2, volume:    30000, bonus:    300 }
+  - { level: 3, volume:    50000, bonus:    500 }
+  - { level: 4, volume:   100000, bonus:   1000 }
+  - { level: 5, volume:   150000, bonus:   1500 }
+  - { level: 6, volume:   250000, bonus:   2500 }
+  - { level: 7, volume:   500000, bonus:   5000 }
+  - { level: 8, volume:   750000, bonus:   7500 }
+  - { level: 9, volume:  1000000, bonus:  10000 }

@@ -9,7 +9,7 @@ of patching the engine.
 
 Usage::
 
-    from referral_engine.hooks import HookRegistry, HookEvent
+    from referral_engine.hooks import HookRegistry, HookedEngine
 
     registry = HookRegistry()
 
@@ -24,7 +24,6 @@ Usage::
     async def push_to_analytics(event: HookEvent) -> None:
         await analytics.track("distribution", event.result.summary())
 
-    # Wire into engine by wrapping distribute():
     engine_with_hooks = HookedEngine(engine, registry)
 
     async with adapter:
@@ -49,9 +48,7 @@ from referral_engine.models import AccrualRecord, DistributionResult
 
 logger = logging.getLogger(__name__)
 
-# All supported hook event types
 HookEventType = str   # "accrual_created" | "distribution_complete" | "distribution_empty"
-
 HookHandler = Callable[["HookEvent"], Awaitable[None]]
 
 
@@ -71,7 +68,7 @@ class HookRegistry:
     Lightweight async hook registry.
 
     Multiple handlers per event type are supported.
-    Handlers are called sequentially (not concurrently) to preserve ordering.
+    Handlers run sequentially to preserve ordering.
     Exceptions in handlers are logged and swallowed — they never affect
     the distribution result.
     """
@@ -111,14 +108,25 @@ class HookedEngine:
     **after** each distribution call.
 
     Hooks fire outside the adapter transaction (after commit).
-    This means hook failures never roll back the distribution.
+    Hook failures never roll back the distribution.
 
-    All other engine methods are proxied transparently.
+    All non-overridden engine methods are proxied transparently.
+    The ``adapter`` property is exposed explicitly to avoid __getattr__
+    ambiguity when used as ``async with hooked_engine.adapter:``.
     """
 
     def __init__(self, engine: ReferralEngine, registry: HookRegistry) -> None:
         self._engine = engine
         self._registry = registry
+
+    # Explicit property — avoids __getattr__ returning wrong object
+    @property
+    def adapter(self):
+        return self._engine.adapter
+
+    @property
+    def config(self):
+        return self._engine.config
 
     def __getattr__(self, name: str):
         return getattr(self._engine, name)
@@ -137,7 +145,7 @@ class HookedEngine:
             accrual_date=accrual_date,
         )
 
-        # Fire per-accrual hooks
+        # Per-accrual hooks
         for accrual in result.accruals:
             await self._registry.fire(
                 HookEvent(
@@ -150,7 +158,7 @@ class HookedEngine:
                 )
             )
 
-        # Fire distribution-level hooks
+        # Distribution-level hook
         event_type = (
             "distribution_complete" if result.levels_reached > 0
             else "distribution_empty"

@@ -182,40 +182,92 @@ class PostgresAdapter(BaseAdapter):
         """
         Recursive CTE walks all direct (level=1) links and materialises
         every ancestor path.  O(N) in tree size, one round-trip.
+
+        When ``scope_user_id`` is provided, only descendants of that user
+        are rebuilt — significantly faster for incremental updates.
         """
-        result = await self.conn.execute(
-            """
-            WITH RECURSIVE chain AS (
-                -- Seed: direct links only
-                SELECT
-                    dl.user_id,
-                    dl.referrer_id,
-                    1 AS computed_level
-                FROM re_referrals dl
-                WHERE dl.level = 1
+        if scope_user_id is not None:
+            # Scoped rebuild: only process users who are descendants of
+            # scope_user_id (i.e. have scope_user_id in their ancestor chain)
+            result = await self.conn.execute(
+                """
+                WITH RECURSIVE
+                -- Step 1: find all descendants of scope_user_id
+                descendants AS (
+                    SELECT user_id
+                    FROM re_referrals
+                    WHERE referrer_id = $1 AND level = 1
 
-                UNION ALL
+                    UNION ALL
 
-                -- Climb: follow parent's direct link
-                SELECT
-                    c.user_id,
-                    parent.referrer_id,
-                    c.computed_level + 1
-                FROM chain c
-                JOIN re_referrals parent
-                    ON parent.user_id = c.referrer_id
-                   AND parent.level   = 1
-                WHERE c.computed_level < 50
+                    SELECT r.user_id
+                    FROM re_referrals r
+                    JOIN descendants d ON r.referrer_id = d.user_id
+                    WHERE r.level = 1
+                ),
+                -- Step 2: rebuild multi-level links only for those descendants
+                chain AS (
+                    SELECT
+                        dl.user_id,
+                        dl.referrer_id,
+                        1 AS computed_level
+                    FROM re_referrals dl
+                    WHERE dl.level = 1
+                      AND dl.user_id IN (SELECT user_id FROM descendants)
+
+                    UNION ALL
+
+                    SELECT
+                        c.user_id,
+                        parent.referrer_id,
+                        c.computed_level + 1
+                    FROM chain c
+                    JOIN re_referrals parent
+                        ON parent.user_id = c.referrer_id
+                       AND parent.level   = 1
+                    WHERE c.computed_level < 50
+                )
+                INSERT INTO re_referrals (user_id, referrer_id, level, created_at)
+                SELECT DISTINCT user_id, referrer_id, computed_level, NOW()
+                FROM chain
+                WHERE computed_level > 1
+                ON CONFLICT (user_id, level)
+                    DO UPDATE SET referrer_id = EXCLUDED.referrer_id
+                """,
+                scope_user_id,
             )
-            INSERT INTO re_referrals (user_id, referrer_id, level, created_at)
-            SELECT DISTINCT user_id, referrer_id, computed_level, NOW()
-            FROM chain
-            WHERE computed_level > 1
-            ON CONFLICT (user_id, level)
-                DO UPDATE SET referrer_id = EXCLUDED.referrer_id
-            """
-        )
-        # "INSERT 0 N" → N
+        else:
+            # Full rebuild
+            result = await self.conn.execute(
+                """
+                WITH RECURSIVE chain AS (
+                    SELECT
+                        dl.user_id,
+                        dl.referrer_id,
+                        1 AS computed_level
+                    FROM re_referrals dl
+                    WHERE dl.level = 1
+
+                    UNION ALL
+
+                    SELECT
+                        c.user_id,
+                        parent.referrer_id,
+                        c.computed_level + 1
+                    FROM chain c
+                    JOIN re_referrals parent
+                        ON parent.user_id = c.referrer_id
+                       AND parent.level   = 1
+                    WHERE c.computed_level < 50
+                )
+                INSERT INTO re_referrals (user_id, referrer_id, level, created_at)
+                SELECT DISTINCT user_id, referrer_id, computed_level, NOW()
+                FROM chain
+                WHERE computed_level > 1
+                ON CONFLICT (user_id, level)
+                    DO UPDATE SET referrer_id = EXCLUDED.referrer_id
+                """
+            )
         try:
             return int(result.split()[-1])
         except (IndexError, ValueError):
@@ -228,6 +280,12 @@ class PostgresAdapter(BaseAdapter):
     async def accrual_exists(
         self, source_key: str, recipient_user_id: int, level: int
     ) -> bool:
+        """
+        Legacy existence check — kept for BaseAdapter compatibility.
+        In practice, ``save_accrual`` uses ON CONFLICT DO NOTHING, so
+        calling this separately creates a TOCTOU race.  Prefer relying
+        on ``save_accrual`` return value (id=None means duplicate).
+        """
         val = await self.conn.fetchval(
             """
             SELECT 1 FROM re_accruals
@@ -243,6 +301,18 @@ class PostgresAdapter(BaseAdapter):
         return val is not None
 
     async def save_accrual(self, accrual: AccrualRecord) -> AccrualRecord:
+        """
+        Atomic insert with idempotency guarantee.
+
+        Uses ``ON CONFLICT DO NOTHING`` — if the row already exists
+        (duplicate event), ``RETURNING id`` returns nothing and
+        ``accrual.id`` stays ``None``.  The caller checks ``saved.id``
+        to determine whether a new accrual was actually written.
+
+        This is race-condition-safe: two concurrent workers attempting
+        the same insert will both succeed at the DB level — one writes,
+        one gets silently ignored.
+        """
         row = await self.conn.fetchrow(
             """
             INSERT INTO re_accruals (
@@ -265,6 +335,7 @@ class PostgresAdapter(BaseAdapter):
         )
         if row:
             accrual.id = row["id"]
+        # accrual.id stays None if conflict — caller interprets as duplicate
         return accrual
 
     async def get_user_accruals(
