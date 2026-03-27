@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#running-tests)
-[![CI](https://github.com/franklin-lol/referral-engine/actions/workflows/tests.yml/badge.svg)](https://github.com/franklin-lol/referral-engine/actions/workflows/tests.yml)
+[![CI](https://github.com/franklin-lol/referral-engine/actions/workflows/python-tests.yml/badge.svg)](https://github.com/franklin-lol/referral-engine/actions/workflows/python-tests.yml)
 
 **Language / Язык:** [English](#) · [Русский](README.ru.md)
 
