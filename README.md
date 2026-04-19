@@ -1,6 +1,7 @@
 # referral-engine
 
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org)
+[![PyPI](https://img.shields.io/pypi/v/referral-engine)](https://pypi.org/project/referral-engine/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#running-tests)
 [![CI](https://github.com/franklin-lol/referral-engine/actions/workflows/tests.yml/badge.svg)](https://github.com/franklin-lol/referral-engine/actions/workflows/tests.yml)
@@ -12,6 +13,24 @@
 Pluggable, async-native multi-level referral distribution engine for Python services.
 
 Drop it into any backend — Telegram bot, REST API, gRPC service — without touching your existing schema. Swap the storage adapter to change the database. Tune every distribution parameter via a single YAML file.
+
+---
+
+## Commercial support
+
+Need a **production deployment**, custom adapter, architecture audit, or integration under a fixed-price contract?
+
+| Contact | Link |
+|---|---|
+| Telegram | [@alex_xela0](https://t.me/alex_xela0) |
+| Email | [fxranxklin@proton.me](mailto:fxranxklin@proton.me) |
+| Live demo | [referralos.vercel.app](https://referralos.vercel.app) |
+| Portfolio | [franklin-sys.vercel.app](https://franklin-sys.vercel.app) |
+
+**Typical engagements:**
+- White-label integration into your project — fixed price
+- CTO-on-demand for TON / Telegram Mini App projects
+- Architecture audit of existing referral systems
 
 ---
 
@@ -495,3 +514,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+## Commercial support
+
+Need a **production deployment**, custom adapter, or integration under a fixed-price contract?  
+→ Telegram: [@alex_xela0](https://t.me/alex_xela0) · Email: [fxranxklin@proton.me](mailto:fxranxklin@proton.me)
+

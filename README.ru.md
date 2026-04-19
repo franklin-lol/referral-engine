@@ -1,6 +1,7 @@
 # referral-engine
 
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org)
+[![PyPI](https://img.shields.io/pypi/v/referral-engine)](https://pypi.org/project/referral-engine/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#запуск-тестов)
 [![CI](https://github.com/franklin-lol/referral-engine/actions/workflows/tests.yml/badge.svg)](https://github.com/franklin-lol/referral-engine/actions/workflows/tests.yml)
@@ -12,6 +13,24 @@
 Подключаемый, async-нативный движок многоуровневого реферального распределения для Python-сервисов.
 
 Встраивается в любой бэкенд — Telegram-бот, REST API, gRPC-сервис — без изменения существующей схемы БД. Смените адаптер хранилища чтобы сменить базу данных. Настройте все параметры распределения через один YAML-файл.
+
+---
+
+## Коммерческая поддержка
+
+Нужна **интеграция под ключ**, кастомный адаптер, аудит архитектуры или фиксированный контракт?
+
+| Контакт | Ссылка |
+|---|---|
+| Telegram | [@alex_xela0](https://t.me/alex_xela0) |
+| Email | [fxranxklin@proton.me](mailto:fxranxklin@proton.me) |
+| Live demo | [referralos.vercel.app](https://referralos.vercel.app) |
+| Портфолио | [franklin-sys.vercel.app](https://franklin-sys.vercel.app) |
+
+**Типичные задачи:**
+- White-label интеграция в ваш проект — фиксированная цена
+- CTO-on-demand для TON / Telegram Mini App проектов  
+- Аудит архитектуры существующих реферальных систем
 
 ---
 
@@ -552,3 +571,11 @@ referral-engine/
 ## Лицензия
 
 MIT — смотрите [LICENSE](LICENSE).
+
+---
+
+## Коммерческая поддержка
+
+Нужна интеграция под ключ или контракт?  
+→ Telegram: [@alex_xela0](https://t.me/alex_xela0) · Email: [fxranxklin@proton.me](mailto:fxranxklin@proton.me)
+
