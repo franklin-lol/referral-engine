@@ -4,7 +4,7 @@
 [![PyPI](https://img.shields.io/pypi/v/referral-engine)](https://pypi.org/project/referral-engine/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#running-tests)
-[![CI](https://github.com/franklin-lol/referral-engine/actions/workflows/python-tests.yml/badge.svg)](https://github.com/franklin-lol/referral-engine/actions/workflows/python-tests.yml)
+[![CI](https://github.com/franklin-lol/referral-engine/actions/workflows/tests.yml/badge.svg)](https://github.com/franklin-lol/referral-engine/actions/workflows/tests.yml)
 
 **Language / Язык:** [English](#) · [Русский](README.ru.md)
 
